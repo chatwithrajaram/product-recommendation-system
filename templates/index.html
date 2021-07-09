@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Sentiment Based Product Recommendation System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+    <style>
+        .dataframe {
+            font-family: Poppins, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        .dataframe td,
+        .dataframe th {
+            padding: 5px;
+            border: 2px solid #cfd8dc;
+        }
+        
+        .dataframe th {
+            padding: 5px;
+            background-color: #607d8b;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .header {
+            background-color: #64b5f6;
+            height: 50px;
+            padding: 5px;
+        }
+        
+        .center-align {
+            text-align: center;
+        }
+        
+        .user-name-input {
+            margin-left: 50px;
+            width: 300px;
+        }
+        
+        .user-name-label {
+            font-weight: bold;
+        }
+        
+        .required-label {
+            font-weight: bold;
+            color: red;
+        }
+        
+        .submit-button {
+            background-color: #757575;
+            color: #fff;
+            border-radius: 5px;
+            width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h3 style="color: #fff" class="center-align">Sentiment Based Product Recommendation System</h3>
+    </div>
+    <br/>
+    <form action="/list-recommendations" method="Post">
+        <p class="center-align">
+            <label class="user-name-label">User Name</label><label class="required-label">*</label>
+            <input class="user-name-input" placeholder="Enter Username" type="text" name="user" required>
+        </p>
+        <p class="center-align"><button class="submit-button" type="submit">Submit</button></p>
+        {% if show_no_user == True and recommended_products=="" %}
+        <div class="center-align" style="font-weight: bold"> <span style="color: red;">
+            There is no user / recommendations exists
+        </span></div> {% endif %}
+    </form>
+    {%if show_results == True%} {{recommended_products|safe}} {%endif%}
+
+
+</body>
+
+</html>
