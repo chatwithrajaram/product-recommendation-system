@@ -34,6 +34,6 @@ class SentimentBasedProductRecommendationSystem:
         temp['prediction'] = self.model.predict(X)
         temp['prediction'] = temp['prediction'].map({'Postive':1,'Negative':0})
         temp=temp.groupby('id').sum()
-        temp['positive_percent']=temp.apply(lambda x: x['prediction']/sum(x), axis=1)
+        temp['positive_percent']=temp.apply(lambda x: 0.0 if sum(x) == 0 else x['prediction']/sum(x), axis=1)
         final_list=temp.sort_values('positive_percent', ascending=False).iloc[:5,:].index
         return self.data[self.data.id.isin(final_list)][columns].drop_duplicates().to_html(index=False)
