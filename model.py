@@ -2,7 +2,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
 import pandas as pd
 
-pickle_folder = 'pickle/archieved/'
+pickle_folder = 'pickle/'
 dataset_folder = 'dataset/'
 columns = ['id','name','brand','categories','manufacturer']
 class SentimentBasedProductRecommendationSystem:
@@ -10,7 +10,15 @@ class SentimentBasedProductRecommendationSystem:
         self.data = self.read_pickle(pickle_folder + 'processed_data.pkl')
         self.user_final_rating = self.read_pickle(pickle_folder + 'user_final_rating.pkl')
         self.model =  self.read_pickle(pickle_folder + 'logistic_reg_model.pkl')
+
         self.raw_data = pd.read_csv(dataset_folder + "sample30.csv")
+        self.raw_data['reviews_didPurchase'].fillna(False,inplace=True)
+        self.raw_data['reviews_doRecommend'].fillna(False,inplace=True)
+        self.raw_data['reviews_title'].fillna('',inplace=True)
+        self.raw_data['manufacturer'].fillna('',inplace=True)
+        self.raw_data['reviews_username'].fillna('',inplace=True)
+        self.raw_data = self.raw_data[self.raw_data['user_sentiment'].notna()]
+
         self.data = pd.concat([self.raw_data[columns],self.data], axis=1)
         
     def read_pickle(self, file_path):
@@ -21,7 +29,7 @@ class SentimentBasedProductRecommendationSystem:
         features = self.read_pickle(pickle_folder + 'tfidf_vectorizer_features.pkl')
         vectorizer = TfidfVectorizer(vocabulary = features)
         temp=self.data[self.data.id.isin(items)]
-        X = vectorizer.fit_transform(temp['Review'])
+        X = vectorizer.fit_transform(temp['review'])
         temp=temp[['id']]
         temp['prediction'] = self.model.predict(X)
         temp['prediction'] = temp['prediction'].map({'Postive':1,'Negative':0})
@@ -29,5 +37,3 @@ class SentimentBasedProductRecommendationSystem:
         temp['positive_percent']=temp.apply(lambda x: x['prediction']/sum(x), axis=1)
         final_list=temp.sort_values('positive_percent', ascending=False).iloc[:5,:].index
         return self.data[self.data.id.isin(final_list)][columns].drop_duplicates().to_html(index=False)
-    
-
