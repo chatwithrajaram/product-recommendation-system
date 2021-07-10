@@ -2,7 +2,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import pickle
 import pandas as pd
 
-pickle_folder = 'pickle/'
+pickle_folder = 'pickle/archieved/'
 dataset_folder = 'dataset/'
 columns = ['id','name','brand','categories','manufacturer']
 class SentimentBasedProductRecommendationSystem:
@@ -21,7 +21,7 @@ class SentimentBasedProductRecommendationSystem:
         features = self.read_pickle(pickle_folder + 'tfidf_vectorizer_features.pkl')
         vectorizer = TfidfVectorizer(vocabulary = features)
         temp=self.data[self.data.id.isin(items)]
-        X = vectorizer.fit_transform(temp['review'])
+        X = vectorizer.fit_transform(temp['Review'])
         temp=temp[['id']]
         temp['prediction'] = self.model.predict(X)
         temp['prediction'] = temp['prediction'].map({'Postive':1,'Negative':0})
