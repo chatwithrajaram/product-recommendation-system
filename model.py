@@ -36,4 +36,6 @@ class SentimentBasedProductRecommendationSystem:
         df_prediction=df_prediction.groupby('id').sum()
         df_prediction['positive_reviews']=df_prediction.apply(lambda x: 0.0 if sum(x) == 0 else x['prediction']/sum(x), axis=1)
         product_recommendations=df_prediction.sort_values('positive_reviews', ascending=False).iloc[:5,:].index
-        return self.data[self.data.id.isin(product_recommendations)][columns].drop_duplicates().to_html(index=False)
+        self.data = self.data[self.data.id.isin(product_recommendations)][columns].drop_duplicates()
+        self.data = self.data.rename(columns={"id": "Product Id", "name": " Product Name", "brand": "Brand", "categories": "Categories", "manufacturer": "Manufacturer"})
+        return self.data.to_html(index=False)
