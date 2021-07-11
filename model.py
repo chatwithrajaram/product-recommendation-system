@@ -9,9 +9,9 @@ class SentimentBasedProductRecommendationSystem:
     def __init__(self):
         self.data = self.read_pickle(pickle_folder + 'processed_data.pkl')
         self.user_final_rating = self.read_pickle(pickle_folder + 'user_final_rating.pkl')
-        self.model =  self.read_pickle(pickle_folder + 'logistic_reg_model.pkl')
-
+        self.logistic_regression_model =  self.read_pickle(pickle_folder + 'logistic_regression_model.pkl')
         self.raw_data = pd.read_csv(dataset_folder + "sample30.csv")
+
         self.raw_data['reviews_didPurchase'].fillna(False,inplace=True)
         self.raw_data['reviews_doRecommend'].fillna(False,inplace=True)
         self.raw_data['reviews_title'].fillna('',inplace=True)
@@ -24,16 +24,16 @@ class SentimentBasedProductRecommendationSystem:
     def read_pickle(self, file_path):
         return pickle.load(open(file_path,'rb'))
 
-    def recommendProducts(self, user):
-        items = self.user_final_rating.loc[user].sort_values(ascending=False)[0:20].index
+    def recommendProducts(self, user_name):
+        items = self.user_final_rating.loc[user_name].sort_values(ascending=False)[0:20].index
         features = self.read_pickle(pickle_folder + 'tfidf_vectorizer_features.pkl')
         vectorizer = TfidfVectorizer(vocabulary = features)
-        temp=self.data[self.data.id.isin(items)]
-        X = vectorizer.fit_transform(temp['review'])
-        temp=temp[['id']]
-        temp['prediction'] = self.model.predict(X)
-        temp['prediction'] = temp['prediction'].map({'Postive':1,'Negative':0})
-        temp=temp.groupby('id').sum()
-        temp['positive_percent']=temp.apply(lambda x: 0.0 if sum(x) == 0 else x['prediction']/sum(x), axis=1)
-        final_list=temp.sort_values('positive_percent', ascending=False).iloc[:5,:].index
-        return self.data[self.data.id.isin(final_list)][columns].drop_duplicates().to_html(index=False)
+        df_prediction=self.data[self.data.id.isin(items)]
+        X = vectorizer.fit_transform(df_prediction['review'])
+        df_prediction=df_prediction[['id']]
+        df_prediction['prediction'] = self.logistic_regression_model.predict(X)
+        df_prediction['prediction'] = df_prediction['prediction'].map({'Postive':1,'Negative':0})
+        df_prediction=df_prediction.groupby('id').sum()
+        df_prediction['positive_reviews']=df_prediction.apply(lambda x: 0.0 if sum(x) == 0 else x['prediction']/sum(x), axis=1)
+        product_recommendations=df_prediction.sort_values('positive_reviews', ascending=False).iloc[:5,:].index
+        return self.data[self.data.id.isin(product_recommendations)][columns].drop_duplicates().to_html(index=False)
